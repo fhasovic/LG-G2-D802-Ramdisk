@@ -6,12 +6,12 @@
 
 import /init.lge.early.rc
 import /init.usb.rc
-import /init.${ro.hardware}.rc
+import /init.g2.rc
 import /init.trace.rc
 
 on early-init
     # Set init and its forked children's oom_adj.
-    write /proc/1/oom_adj -16
+    write /proc/1/oom_score_adj -1000
 
     # Set the security context for the init process.
     # This should occur before anything else (e.g. ueventd) is started.
@@ -265,8 +265,8 @@ on boot
     chmod 0664 /sys/module/lowmemorykiller/parameters/minfree
 
     # Tweak background writeout
-    write /proc/sys/vm/dirty_expire_centisecs 200
-    write /proc/sys/vm/dirty_background_ratio  5
+#   write /proc/sys/vm/dirty_expire_centisecs 200
+#   write /proc/sys/vm/dirty_background_ratio  5
 
     # Permissions for System Server and daemons.
     chown radio system /sys/android_power/state

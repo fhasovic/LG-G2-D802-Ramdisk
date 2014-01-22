@@ -192,11 +192,6 @@ on boot
 	setprop persist.service.bdroid.a2dp_con 0
 	setprop persist.service.bdroid.scms_t 0
 
-    # Fix audio decoder for sound driver in STOCK ROMS thanks to acer73@xda
-    setprop lpa.decode false
-    setprop ro.lpa.decode false
-
-
 # LGE_CHANGE_S, [BT][younghyun.kwon@lge.com], 2013-03-21, For BCM4335 AXI Patch
     chown bluetooth net_bt_stack /dev/btlock
     chmod 0600 /dev/btlock
@@ -275,7 +270,7 @@ on boot
     # LGE_UPDATE_END
 
     # enable exfat feature
-       insmod /system/lib/modules/texfat.ko
+    insmod /lib/modules/exfat.ko
 
 # msm specific files that need to be created on /data
 on post-fs-data
@@ -1047,9 +1042,8 @@ on property:persist.service.moca.enable=0
    start moca_service_disable
 #LGE_CHANGE_E 2012.04 for MOCA
 
-# run our own post-boot script instead of whatever might be in the ROM or added
-# by the user
-service qcom-post-boot /system/bin/sh /stockmodkernel.sh
+# Run Kernel Tunings
+service qcom-post-boot /sbin/busybox sh /kernel_cortex.sh
     class core
     user root
     oneshot
