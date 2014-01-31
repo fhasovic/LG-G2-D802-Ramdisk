@@ -84,8 +84,8 @@ echo "1" > /sys/kernel/fast_charge/force_fast_charge;
 chmod 444 /sys/kernel/fast_charge/force_fast_charge;
 
 # Disable ROM CPU controller
-mv /system/bin/mpdecision /system/bin/mpdecision.disabled
-pkill -f "/system/bin/mpdecision";
+#mv /system/bin/mpdecision /system/bin/mpdecision.disabled
+#pkill -f "/system/bin/mpdecision";
 
 echo "1" > /sys/devices/system/cpu/cpu1/online;
 echo "1" > /sys/devices/system/cpu/cpu2/online;
@@ -98,18 +98,19 @@ chown system /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
 chown system /sys/devices/system/cpu/cpufreq/ondemand/powersave_bias
 chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
 chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
-chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
-chown system /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq
-chown system /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
-chown system /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq
-chown system /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq
+#chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+#chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
+#chown system /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq
+#chown system /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
+#chown system /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq
+#chown system /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq
 chown root.system /sys/devices/system/cpu/cpu1/online
 chown root.system /sys/devices/system/cpu/cpu2/online
 chown root.system /sys/devices/system/cpu/cpu3/online
 chmod 666 /sys/devices/system/cpu/cpu1/online
 chmod 666 /sys/devices/system/cpu/cpu2/online
 chmod 666 /sys/devices/system/cpu/cpu3/online
+chmod 666 /sys/module/intelli_plug/parameters/*
 
 chown -R root:root /data/property;
 chmod -R 0700 /data/property
@@ -142,41 +143,18 @@ echo 1 > /sys/module/pm_8x60/modes/cpu0/power_collapse/idle_enabled
 soc_revision=$(cat /sys/devices/soc0/revision)
 if [ "$soc_revision" != "1.0" ]; then
         echo 0 > /sys/module/pm_8x60/modes/cpu0/retention/idle_enabled
-        echo 0 > /sys/module/pm_8x60/modes/cpu1/retention/idle_enabled
-        echo 0 > /sys/module/pm_8x60/modes/cpu2/retention/idle_enabled
-        echo 0 > /sys/module/pm_8x60/modes/cpu3/retention/idle_enabled
+#        echo 0 > /sys/module/pm_8x60/modes/cpu1/retention/idle_enabled
+#        echo 0 > /sys/module/pm_8x60/modes/cpu2/retention/idle_enabled
+#        echo 0 > /sys/module/pm_8x60/modes/cpu3/retention/idle_enabled
 fi
-
-# Tweak the sampling rates and load thresholds
-echo 10000 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate
-echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
-echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_any_cpu_load
-echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_multi_core
-echo 10 > /sys/devices/system/cpu/cpufreq/ondemand/down_differential
-echo 4 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
-
-# tweak some other settings
-echo 0 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
-echo 0 > /sys/devices/system/cpu/cpufreq/ondemand/powersave_bias
-
-# set sync frequencies
-echo 960000 > /sys/devices/system/cpu/cpufreq/ondemand/optimal_freq
-echo 960000 > /sys/devices/system/cpu/cpufreq/ondemand/sync_freq
-echo 960000 > /sys/devices/system/cpu/cpufreq/ondemand/optimal_max_freq
 
 # set minimum frequencies
 echo 300000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-echo 300000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
-echo 300000 > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
-echo 300000 > /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq
+#echo 300000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
+#echo 300000 > /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq
+#echo 300000 > /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq
 
-# set grid steps
-echo 7 > /sys/devices/system/cpu/cpufreq/ondemand/middle_grid_step
-echo 40 > /sys/devices/system/cpu/cpufreq/ondemand/middle_grid_load
-echo 14 > /sys/devices/system/cpu/cpufreq/ondemand/high_grid_step
-echo 50 > /sys/devices/system/cpu/cpufreq/ondemand/high_grid_load
-
-echo 1 > /sys/module/msm_thermal/core_control/enabled
+echo 0 > /sys/module/msm_thermal/core_control/enabled
 echo 1 > /dev/cpuctl/apps/cpu.notify_on_migrate
 
 # Tweak some VM settings for system smoothness
@@ -187,7 +165,8 @@ echo 40 > /proc/sys/vm/dirty_ratio
 echo ondemand > /sys/devices/fdb00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/pwrscale/trustzone/governor
 
 # set default readahead
-echo 512 > /sys/block/mmcblk0/bdi/read_ahead_kb
+echo 1024 > /sys/block/mmcblk0/bdi/read_ahead_kb
+echo 1024 > /sys/block/mmcblk0/queue/read_ahead_kb
 
 # make sure our max gpu clock is set via sysfs
 echo 450000000 > /sys/class/kgsl/kgsl-3d0/max_gpuclk
@@ -203,7 +182,6 @@ setprop lpa.decode false
 # Fix ROM dev wrong sets.
 setprop persist.adb.notify 0
 setprop persist.service.adb.enable 1
-setprop persist.sys.use_dithering 1
 setprop dalvik.vm.execution-mode int:jit
 setprop pm.sleep_mode 1
 
@@ -212,9 +190,6 @@ $BB chown -R root:root /tmp;
 $BB chown -R root:root /res;
 $BB chown -R root:root /sbin;
 $BB chown -R root:root /lib;
-
-# set sysrq to 2 = enable control of console logging level as with CM-KERNEL
-echo "2" > /proc/sys/kernel/sysrq;
 
 PIDOFINIT=$(pgrep -f "/sbin/ext/post-init.sh");
 for i in $PIDOFINIT; do
@@ -232,7 +207,7 @@ fi;
 
 # reset profiles auto trigger to be used by kernel ADMIN, in case of need, if new value added in default profiles
 # just set numer $RESET_MAGIC + 1 and profiles will be reset one time on next boot with new kernel.
-RESET_MAGIC=1;
+RESET_MAGIC=3;
 if [ ! -e /data/.dori/reset_profiles ]; then
 	echo "0" > /data/.dori/reset_profiles;
 fi;
@@ -270,29 +245,11 @@ fi;
 	sleep 20;
 	# order of modules load is important
 
-	if [ "$usbserial_module" == "on" ]; then
-		if [ -e /system/lib/modules/usbserial.ko ]; then
-			$BB insmod /system/lib/modules/usbserial.ko;
-			$BB insmod /system/lib/modules/ftdi_sio.ko;
-			$BB insmod /system/lib/modules/pl2303.ko;
-		else
-			$BB insmod /lib/modules/usbserial.ko;
-			$BB insmod /lib/modules/ftdi_sio.ko;
-			$BB insmod /lib/modules/pl2303.ko;
-		fi;
-	fi;
 	if [ "$cifs_module" == "on" ]; then
 		if [ -e /system/lib/modules/cifs.ko ]; then
 			$BB insmod /system/lib/modules/cifs.ko;
 		else
 			$BB insmod /lib/modules/cifs.ko;
-		fi;
-	fi;
-	if [ "$eds_module" == "on" ]; then
-		if [ -e /system/lib/modules/eds.ko ]; then
-			$BB insmod /system/lib/modules/eds.ko;
-		else
-			$BB insmod /lib/modules/eds.ko;
 		fi;
 	fi;
 )&
@@ -315,12 +272,6 @@ mount -t tmpfs -o mode=0777,gid=1000 tmpfs /mnt/ntfs
 
 OPEN_RW;
 
-# custom boot booster stage 1
-echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq;
-echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq;
-echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq;
-echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq;
-
 (
 	COUNTER=0;
 	echo "0" > /tmp/uci_done;
@@ -330,10 +281,6 @@ echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_f
 		if [ "$COUNTER" -ge "40" ]; then
 			break;
 		fi;
-		echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq;
-		echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq;
-		echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq;
-		echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq;
 		pkill -f "com.gokhanmoral.stweaks.app";
 		echo "Waiting For UCI to finish";
 		sleep 3;
@@ -341,37 +288,16 @@ echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_f
 		# max 2min
 	done;
 
-	# restore normal freq
-	echo "$cpu_max_freq" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq;
-	echo "$cpu_max_freq" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq;
-	echo "$cpu_max_freq" > /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq;
-	echo "$cpu_max_freq" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq;
-
         # Enable ROM CPU Controller
-	if [ "$(pgrep -f "mpdecision" | wc -l)" -eq "0" ]; then
-		mv /system/bin/mpdecision.disabled /system/bin/mpdecision
-		/system/bin/mpdecision --no_sleep --avg_comp &
-	fi;
+#	if [ "$(pgrep -f "mpdecision" | wc -l)" -eq "0" ]; then
+#		mv /system/bin/mpdecision.disabled /system/bin/mpdecision
+#		/system/bin/mpdecision --no_sleep --avg_comp &
+#	fi;
 
 	# Cortex parent should be ROOT/INIT and not STweaks
 	nohup /sbin/ext/cortexbrain-tune.sh;
 	CORTEX=$(pgrep -f "/sbin/ext/cortexbrain-tune.sh");
 	echo "-900" > /proc/"$CORTEX"/oom_score_adj;
-
-	# tweaks all the dm partitions that hold moved to sdcard apps
-	sleep 10;
-	DM_COUNT=$(find /sys/block/dm* | wc -l);
-	if [ "$DM_COUNT" -gt "0" ]; then
-		for d in $($BB mount | grep dm | cut -d " " -f1 | grep -v vold); do
-			$BB mount -o remount,noauto_da_alloc "$d";
-		done;
-
-		DM=$(find /sys/block/dm*);
-		for i in ${DM}; do
-			echo "0" > "$i"/queue/rotational;
-			echo "0" > "$i"/queue/iostats;
-		done;
-	fi;
 
 	# script finish here, so let me know when
 	TIME_NOW=$(date)
@@ -380,7 +306,7 @@ echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_f
 
 (
 	# stop uci.sh from running all the PUSH Buttons in stweaks on boot
-	$BB mount -o remount,rw rootfs;
+	$BB mount -o remount,rw /;
 	$BB chown -R root:system /res/customconfig/actions/;
 	$BB chmod -R 6755 /res/customconfig/actions/;
 	$BB mv /res/customconfig/actions/push-actions/* /res/no-push-on-boot/;
@@ -401,7 +327,6 @@ echo "$cpu_boot_boost_freq" > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_f
 	pkill -f "com.gokhanmoral.stweaks.app";
 
 	# update cpu tunig after profiles load
-	$BB sh /sbin/ext/cortexbrain-tune.sh apply_cpu update > /dev/null;
 	$BB rm -f /data/.dori/booting;
 
 	# correct oom tuning, if changed by apps/rom
