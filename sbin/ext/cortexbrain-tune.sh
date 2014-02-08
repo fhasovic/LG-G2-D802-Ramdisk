@@ -322,6 +322,26 @@ IO_SCHEDULER()
 	fi;
 }
 
+CPU_CENTRAL_CONTROL()
+{
+	if [ "$cortexbrain_cpu" == "on" ]; then
+
+		local state="$1";
+
+		if [ "$state" == "awake" ]; then
+			echo "$cpu_min_freq" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq;
+			echo "$cpu_max_freq" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq;
+		elif [ "$state" == "sleep" ]; then
+			echo "$cpu_min_freq" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq;
+			echo "$cpu_max_freq" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq;
+		fi;
+		return 1;
+		log -p i -t "$FILE_NAME" "*** CPU_CENTRAL_CONTROL max_freq:${cpu_max_freq} min_freq:${cpu_min_freq}***: done";
+	else
+		return 0;
+	fi;
+}
+
 # ==============================================================
 # TWEAKS: if Screen-ON
 # ==============================================================
@@ -329,6 +349,7 @@ AWAKE_MODE()
 {
 	NET "awake";
 	IO_SCHEDULER "awake";
+	CPU_CENTRAL_CONTROL "awake";
 	(
 		sleep 2;
 		IPV6;
@@ -347,6 +368,7 @@ SLEEP_MODE()
 
 	CROND_SAFETY;
 	IO_SCHEDULER "sleep";
+	CPU_CENTRAL_CONTROL "sleep";
 	NET "sleep";
 	IPV6;
 
