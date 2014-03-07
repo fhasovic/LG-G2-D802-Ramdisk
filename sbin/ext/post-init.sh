@@ -17,6 +17,17 @@ OPEN_RW;
 # Boot with ROW I/O Gov
 $BB echo "row" > /sys/block/mmcblk0/queue/scheduler;
 
+VDD_HIGH_FREQ()
+{
+	# Prevent user messing with HIGH Freq Voltages!
+	$BB chmod 666 /sys/devices/system/cpu/cpufreq/vdd_levels;
+	$BB echo "2419200 1030000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels;
+	$BB echo "2572800 1060000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels;
+	$BB echo "2726400 1090000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels;
+	$BB echo "2803200 1120000" > /sys/devices/system/cpu/cpufreq/vdd_table/vdd_levels;
+}
+VDD_HIGH_FREQ;
+
 # clean old modules from /system and add new from ramdisk
 if [ ! -d /system/lib/modules ]; then
         $BB mkdir /system/lib/modules;
@@ -88,19 +99,14 @@ ONDEMAND_TUNING()
 	echo "20" > /cpugov/ondemand/down_differential;
 	echo "3" > /cpugov/ondemand/down_differential_multi_core;
 	echo "1" > /cpugov/ondemand/enable_turbo_mode;
-	echo "80" > /cpugov/ondemand/high_grid_load;
-	echo "20" > /cpugov/ondemand/high_grid_step;
 	echo "95" > /cpugov/ondemand/micro_freq_up_threshold;
-	echo "80" > /cpugov/ondemand/middle_grid_load;
-	echo "10" > /cpugov/ondemand/middle_grid_step;
-	echo "300000" > /cpugov/ondemand/optimal_freq;
-	echo "1574400" > /cpugov/ondemand/optimal_max_freq;
-	echo "3" > /cpugov/ondemand/sampling_down_factor;
-	echo "80000" > /cpugov/ondemand/sampling_rate;
-	echo "300000" > /cpugov/ondemand/sync_freq;
-	echo "70" > /cpugov/ondemand/up_threshold;
+	echo "0" > /cpugov/ondemand/optimal_freq;
+	echo "1" > /cpugov/ondemand/sampling_down_factor;
+	echo "60000" > /cpugov/ondemand/sampling_rate;
+	echo "0" > /cpugov/ondemand/sync_freq;
+	echo "80" > /cpugov/ondemand/up_threshold;
 	echo "80" > /cpugov/ondemand/up_threshold_any_cpu_load;
-	echo "95" > /cpugov/ondemand/up_threshold_multi_core;
+	echo "90" > /cpugov/ondemand/up_threshold_multi_core;
 }
 
 # oom and mem perm fix
@@ -162,7 +168,7 @@ echo 20 > /proc/sys/vm/dirty_background_ratio
 echo 40 > /proc/sys/vm/dirty_ratio
 
 # set ondemand GPU governor as default
-echo simple > /sys/devices/fdb00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/pwrscale/trustzone/governor
+echo "ondemand" > /sys/devices/fdb00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/pwrscale/trustzone/governor
 
 # set default readahead
 echo 1024 > /sys/block/mmcblk0/bdi/read_ahead_kb
@@ -201,7 +207,7 @@ fi;
 
 # reset profiles auto trigger to be used by kernel ADMIN, in case of need, if new value added in default profiles
 # just set numer $RESET_MAGIC + 1 and profiles will be reset one time on next boot with new kernel.
-RESET_MAGIC=10;
+RESET_MAGIC=11;
 if [ ! -e /data/.dori/reset_profiles ]; then
 	echo "0" > /data/.dori/reset_profiles;
 fi;
@@ -326,6 +332,9 @@ $BB mount -t tmpfs -o mode=0777,gid=1000 tmpfs /mnt/ntfs
 
 	# Fix critical perms again after init.d mess
 	CRITICAL_PERM_FIX;
+
+	# Fix High freq voltages!
+	VDD_HIGH_FREQ;
 
 	# script finish here, so let me know when
 	TIME_NOW=$(date)

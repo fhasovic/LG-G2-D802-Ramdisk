@@ -1,9 +1,10 @@
 stweaks_boot_control=yes
 hotplug=default
-eco_mode_active=on
+eco_mode=eco
 msm_thermal=msm_temp
-core_limit_temp_degC=78
-limit_temp_degC=80
+enabled=on
+core_limit_temp_degC=80
+limit_temp_degC=75
 default_cpu_gov=ondemand
 cortexbrain_cpu=off
 cpu_max_freq=1958400

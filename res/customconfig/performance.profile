@@ -1,12 +1,13 @@
 stweaks_boot_control=yes
 hotplug=default
-eco_mode_active=off
+eco_mode=all
 msm_thermal=msm_temp
-core_limit_temp_degC=83
-limit_temp_degC=85
+enabled=off
+core_limit_temp_degC=80
+limit_temp_degC=75
 default_cpu_gov=ondemand
 cortexbrain_cpu=off
-cpu_max_freq=2496000
+cpu_max_freq=2572800
 cpu_min_freq=300000
 read_ahead_kb=1024
 scheduler=row
